@@ -1,0 +1,101 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+*.pyo
+*.sqlite3
+*.db
+*.db-journal
+
+# Django migrations
+**/migrations/
+!*/migrations/__init__.py
+
+# Media and static files (collected/generated)
+media/
+staticfiles/
+static/
+
+# Virtual environment
+env/
+venv/
+ENV/
+.venv/
+.env/
+.Python
+
+# VSCode and IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# macOS and system files
+.DS_Store
+Thumbs.db
+
+# Environment variables and secrets
+.env
+*.env
+
+# pip
+pip-log.txt
+
+# pytest
+htmlcov/
+.coverage
+.tox/
+.nox/
+.pytest_cache/
+
+# Celery beat schedule and pid files
+celerybeat-schedule
+celerybeat.pid
+
+# mypy and other type checkers
+.mypy_cache/
+.dmypy.json
+.pyre/
+.pytype/
+
+# coverage reports
+htmlcov/
+coverage.xml
+*.cover
+.cache
+nosetests.xml
+test-results.xml
+junit-xml-output.xml
+
+# Sphinx documentation
+docs/_build/
+
+# pyenv
+.python-version
+
+# Local database backups
+*.bak
+*.dump
+
+# npm/node modules (if using frontend tools)
+node_modules/
+
+# Build output
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# JetBrains IDE
+.idea/
+
+
+#enviroment variables
+venv/
+.env/
+# Local settings
