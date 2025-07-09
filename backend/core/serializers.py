@@ -1,15 +1,15 @@
 from rest_framework import serializers
-from .models import Board, Column, Task, User
-from django.contrib.auth.password_validation import validate_password
+from .models import User, Board, Column, Task
+from django.contrib.auth import get_user_model
 
-class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, validators=[validate_password])
-    email = serializers.EmailField(required=True)
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ('username', 'email', 'password')
+        model = get_user_model()
+        fields = ['id', 'username', 'password']
+        extra_kwargs = {'password': {'write_only': True}}
+
     def create(self, validated_data):
-        user = User.objects.create_user(**validated_data)
+        user = get_user_model().objects.create_user(**validated_data)
         return user
 
 class TaskSerializer(serializers.ModelSerializer):

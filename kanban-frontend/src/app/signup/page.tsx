@@ -1,14 +1,15 @@
 "use client";
-import { useState } from 'react';
+import { use, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 
-export default function LoginPage() {
+export default function SignupPage() {
   const router = useRouter();
 
   const [formData, setFormData] = useState({
     username: '',
+    email: '',
     password: '',
   });
 
@@ -23,12 +24,13 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await axios.post('http://localhost:8000/api/auth/login/', formData);
+      const res = await axios.post('http://localhost:8000/api/auth/register/', formData);
       localStorage.setItem('token', res.data.token);
-      toast.success('Login successful');
+      toast.success('Signup successful');
       router.push('/board'); // redirect to kanban board
     } catch (err: any) {
-      toast.error(err.response?.data?.error || 'Login failed');
+      console.log("Signup error:", err.response?.data); 
+      toast.error(err.response?.data?.error || 'Signup failed');
     } finally {
       setLoading(false);
     }
@@ -40,13 +42,23 @@ export default function LoginPage() {
         onSubmit={handleSubmit}
         className="bg-white shadow-md rounded p-6 w-full max-w-md space-y-4"
       >
-        <h2 className="text-xl font-bold mb-2">Login</h2>
+        <h2 className="text-xl font-bold mb-2">Create your account</h2>
 
         <input
           type="text"
           name="username"
           placeholder="Username"
           value={formData.username}
+          onChange={handleChange}
+          required
+          className="w-full border px-3 py-2 rounded"
+        />
+
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={formData.email}
           onChange={handleChange}
           required
           className="w-full border px-3 py-2 rounded"
@@ -67,7 +79,7 @@ export default function LoginPage() {
           className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
           disabled={loading}
         >
-          {loading ? 'Logging in...' : 'Login'}
+          {loading ? 'Signing up...' : 'Sign Up'}
         </button>
       </form>
     </div>

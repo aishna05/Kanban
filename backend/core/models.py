@@ -1,27 +1,20 @@
-from django.db import models
-
-# Create your models here.
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 class User(AbstractUser):
-    email = models.EmailField(unique=True)
-
-    def __str__(self):
-        return self.username
+    pass
 
 class Board(models.Model):
-    name = models.CharField(max_length=100)
+    title = models.CharField(max_length=100, default='New Board')
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
 class Column(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, default='New Column')
     board = models.ForeignKey(Board, on_delete=models.CASCADE, related_name='columns')
-    order = models.PositiveIntegerField()
+    position = models.IntegerField(default=0)
 
 class Task(models.Model):
-    title = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
+    title = models.CharField(max_length=100, default='New Task')
+    description = models.TextField(blank=True, default='')
     column = models.ForeignKey(Column, on_delete=models.CASCADE, related_name='tasks')
-    order = models.PositiveIntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
+    position = models.IntegerField(default=0)

@@ -1,60 +1,83 @@
-import { useEffect, useState } from 'react';
-import api from '../../services/api';
-import { Board, Column, Task } from '../../types/types';
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+'use client';
 
-export default function BoardPage() {
-  const [columns, setColumns] = useState<Column[]>([]);
+import React, { useEffect, useState } from 'react';
+import { getTasks, createTask, updateTask, deleteTask } from '@/services/api';
+import { Task } from '@/types/types';
+
+export default function TaskPage() {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [newTask, setNewTask] = useState({ title: '', description: '' });
+  const [editTaskId, setEditTaskId] = useState<number | null>(null);
 
   useEffect(() => {
-    api.get('boards/1/').then(res => setColumns(res.data.columns));
+    const fetchTasks = async () => {
+      const data = await getTasks();
+      setTasks(data);
+    };
+    fetchTasks();
   }, []);
 
-  const onDragEnd = (result: any) => {
-    // Handle reordering logic (optional: PATCH to update order)
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (editTaskId) {
+      const updated = await updateTask(editTaskId, newTask);
+      setTasks(tasks.map(t => (t.id === editTaskId ? updated : t)));
+      setEditTaskId(null);
+    } else {
+      const created = await createTask(newTask);
+      setTasks([...tasks, created]);
+    }
+
+    setNewTask({ title: '', description: '' });
   };
 
-  const handleExport = () => {
-    window.open('http://localhost:8000/api/boards/1/export-pdf/');
+  const handleEdit = (task: Task) => {
+    setNewTask({ title: task.title, description: task.description });
+    setEditTaskId(task.id);
+  };
+
+  const handleDelete = async (id: number) => {
+    await deleteTask(id);
+    setTasks(tasks.filter(t => t.id !== id));
   };
 
   return (
-    <div>
-      <h1>Kanban Board</h1>
-      <button onClick={handleExport}>Export as PDF</button>
-      <DragDropContext onDragEnd={onDragEnd}>
-        <div style={{ display: 'flex', gap: '1rem' }}>
-          {columns.map(col => (
-            <Droppable droppableId={col.id.toString()} key={col.id}>
-              {(provided) => (
-                <div
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                  style={{ background: '#eee', padding: 10, minWidth: 250 }}
-                >
-                  <h3>{col.name}</h3>
-                  {col.tasks.map((task, idx) => (
-                    <Draggable key={task.id} draggableId={task.id.toString()} index={idx}>
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          style={{ margin: '8px 0', padding: 8, background: '#fff', ...provided.draggableProps.style }}
-                        >
-                          <strong>{task.title}</strong>
-                          <p>{task.description}</p>
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          ))}
-        </div>
-      </DragDropContext>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">Task Manager</h1>
+
+      <form onSubmit={handleSubmit} className="mb-6 flex flex-col gap-3 max-w-md">
+        <input
+          type="text"
+          placeholder="Title"
+          value={newTask.title}
+          onChange={e => setNewTask({ ...newTask, title: e.target.value })}
+          required
+          className="border p-2 rounded"
+        />
+        <textarea
+          placeholder="Description"
+          value={newTask.description}
+          onChange={e => setNewTask({ ...newTask, description: e.target.value })}
+          className="border p-2 rounded"
+        />
+        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
+          {editTaskId ? 'Update Task' : 'Add Task'}
+        </button>
+      </form>
+
+      <div className="grid gap-4">
+        {tasks.map(task => (
+          <div key={task.id} className="p-4 bg-white rounded shadow border">
+            <h3 className="font-semibold">{task.title}</h3>
+            <p className="text-sm text-gray-600">{task.description}</p>
+            <div className="flex gap-3 mt-2">
+              <button onClick={() => handleEdit(task)} className="text-blue-600">Edit</button>
+              <button onClick={() => handleDelete(task.id)} className="text-red-600">Delete</button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
